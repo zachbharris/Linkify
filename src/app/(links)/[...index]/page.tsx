@@ -1,3 +1,6 @@
+import prisma from "@/lib/prisma";
+import { notFound } from "next/navigation";
+
 type Props = {
   params: {
     index: string[];
@@ -5,8 +8,23 @@ type Props = {
 };
 
 export default async function LinkPage({ params: { index } }: Props) {
-  const [username] = index;
+  const [slug] = index;
+
+  const tree = await prisma.tree.findUnique({
+    where: {
+      slug,
+    },
+  });
+
+  if (!tree) {
+    return notFound();
+  }
 
   // request planetscale data
-  return <p>@{username}</p>;
+  return (
+    <div>
+      <p>@{tree.slug}</p>
+      {tree.description ? <p>{tree.description}</p> : null}
+    </div>
+  );
 }

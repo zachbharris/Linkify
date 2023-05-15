@@ -58,6 +58,7 @@ model User {
   role          String?   @default("user")
   accounts      Account[]
   sessions      Session[]
+  tress         Tree[]
 }
 
 model VerificationToken {
@@ -66,4 +67,27 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Tree {
+  id          String     @id @default(cuid())
+  slug        String     @unique
+  description String?
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  items       TreeItem[]
+  order       Json?
+
+  @@index([userId])
+}
+
+model TreeItem {
+  id     String  @id @default(cuid())
+  type   String? @default("link")
+  text   String?
+  link   String?
+  tree   Tree    @relation(fields: [treeId], references: [id], onDelete: Cascade)
+  treeId String
+
+  @@index([treeId])
 }
